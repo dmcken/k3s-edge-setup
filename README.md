@@ -1,12 +1,8 @@
 # k3s-edge-setup
 
-Mostly pulled from the following:
-* Installing k3s and calico:
-  * https://docs.tigera.io/calico/latest/getting-started/kubernetes/k3s/quickstart
-  * https://docs.tigera.io/calico/latest/getting-started/kubernetes/k3s/multi-node-install
-* Setting up BGP:
-  * https://docs.tigera.io/calico/latest/reference/resources/bgpconfig - general config
-  * https://docs.tigera.io/calico/latest/networking/configuring/bgp - Peering
+
+## Prerequisites:
+* Ubuntu 
 
 ## Single Node:
 ### Install K3s (change the cluster-cidr to a free network on your network)
@@ -19,7 +15,7 @@ curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" INSTALL_K3S_EXEC="--fla
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/tigera-operator.yaml
 
 wget https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/custom-resources.yaml
-sed 's/cidr: 192.168.0.0\/16/cidr: 172.30.0.0\/18/g' custom-resources.yaml
+sed 's/cidr: 192.168.0.0\/16/cidr: 172.30.64.0\/18/g' custom-resources.yaml
 kubectl create -f custom-resources.yaml
 ```
 
@@ -63,6 +59,18 @@ If you get any errors these need to be resolved first.
 
 #### Global BGP Config: 
 Create a file calico-default-bgp-config.yaml with the following contents:
+
+```
+kubectl get nodes -o wide
+NAME     STATUS   ROLES                  AGE   VERSION        INTERNAL-IP     EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
+k3s001   Ready    control-plane,master   12h   v1.28.6+k3s2   192.168.1.120   <none>        Ubuntu 22.04.3 LTS   5.15.0-94-generic   containerd://1.7.11-k3s2
+
+calicoctl get nodes -o wide
+NAME     ASN       IPV4               IPV6   
+k3s001   (64512)   192.168.1.120/24          
+```
+
+ Setup the global config
 ```
 apiVersion: projectcalico.org/v3
 kind: BGPConfiguration
@@ -73,14 +81,20 @@ spec:
   nodeToNodeMeshEnabled: true
   nodeMeshMaxRestartTime: 120s
   asNumber: 63400
+  bindMode: NodeIP
   serviceClusterIPs:
     - cidr: 10.96.0.0/12
   serviceExternalIPs:
     - cidr: 104.244.42.129/32
     - cidr: 172.217.3.0/24
-  listenPort: 178
-  bindMode: NodeIP
+  listenPort: 179
+  
 ```
+
+Notes:
+* The NodeIP is the IP of the host itself (Node in Kurbernetes parlance):
+  * `kubectl get nodes -o yaml`
+  * `calicoctl get nodes -o yaml`
 
 #### BGP Peers:
 Create a file global-bgp-peer.yaml with the following contents:
@@ -96,3 +110,20 @@ spec:
 
 ## Multi-node:
 TODO
+
+## Useful commands
+
+* kubectl
+  * `kubectl get installations -o yaml`
+* calicoctl
+* Done
+
+## References:
+* Installing k3s and calico:
+  * https://docs.tigera.io/calico/latest/getting-started/kubernetes/k3s/quickstart
+  * https://docs.tigera.io/calico/latest/getting-started/kubernetes/k3s/multi-node-install
+* Setting up BGP:
+  * https://docs.tigera.io/calico/latest/reference/resources/bgpconfig - general config
+  * https://docs.tigera.io/calico/latest/networking/configuring/bgp - Peering
+* IP Pools
+  * https://devpress.csdn.net/k8s/62fce6a87e66823466190eac.html - Calico VxLAN pool
