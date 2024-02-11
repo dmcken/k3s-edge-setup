@@ -108,6 +108,7 @@ Notes:
 #### BGP Peers:
 Create a file global-bgp-peer.yaml with the following contents:
 ```
+cat <<EOF >calico-bgp-upstream-peer.cfg
 apiVersion: projectcalico.org/v3
 kind: BGPPeer
 metadata:
@@ -115,6 +116,9 @@ metadata:
 spec:
   peerIP: 192.168.1.1
   asNumber: 64567
+EOF
+
+calicoctl apply -f calico-bgp-upstream-peer.cfg
 ```
 
 ## Multi-node:
