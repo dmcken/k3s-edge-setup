@@ -50,6 +50,15 @@ spec:
   kubeconfig: '/etc/rancher/k3s/k3s.yaml'
 ```
 
+Verify calicoctl is working:
+
+```
+dmcken@k3s001:~$ calicoctl get nodes 
+NAME     
+k3s001   
+```
+If you get any errors these need to be resolved first.
+
 ### Setup BGP:
 
 #### Global BGP Config: 
