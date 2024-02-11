@@ -19,9 +19,9 @@ sed -i 's/cidr: 192.168.0.0\/16/cidr: 172.30.64.0\/18/g' custom-resources.yaml
 kubectl create -f custom-resources.yaml
 ```
 
-Verify the node is operational (confirm the status is Ready):
+Wait and Verify the node is operational (confirm the status is Ready):
 ```
-dmcken@k3s001:~$  kubectl get nodes
+dmcken@k3s001:~$  watch kubectl get nodes
 NAME     STATUS   ROLES                  AGE    VERSION
 k3s001   Ready    control-plane,master   130m   v1.28.6+k3s2
 ```
