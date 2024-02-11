@@ -25,12 +25,22 @@ kubectl create -f custom-resources.yaml
 
 ### Install calicoctl :
 
-Use `whereis kubectl` to find where that command is and move it to the same folder if not /usr/local/bin.
+Use `whereis kubectl` to find where that command is and move it to the same folder if it is not /usr/local/bin
 
 ```
 curl -L https://github.com/projectcalico/calico/releases/download/v3.27.0/calicoctl-linux-amd64 -o calicoctl
 chmod +x ./calicoctl
 sudo mv calicoctl /usr/local/bin/
+```
+
+Create `/etc/calico/calicoctl.cfg` with mode 644 and the following contents:
+```
+apiVersion: projectcalico.org/v3
+kind: CalicoAPIConfig
+metadata:
+spec:
+  datastoreType: 'kubernetes'
+  kubeconfig: '/etc/rancher/k3s/k3s.yaml'
 ```
 
 ### Setup BGP:
