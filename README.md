@@ -1,10 +1,15 @@
 # k3s-edge-setup
 
+Problem definition: 
 
-## Prerequisites:
-* Ubuntu 
+
 
 ## Single Node:
+### Prerequisites:
+* Ubuntu 22.04
+* Static IP is not required (DHCP with a static lease to anchor the BGP peer).
+* Local user with sudo privileges.
+
 ### Install K3s (change the cluster-cidr to a free network on your network)
 ```
 curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" INSTALL_K3S_EXEC="--flannel-backend=none --cluster-cidr=172.30.0.0/18 --disable-network-policy --disable=traefik" sh -
