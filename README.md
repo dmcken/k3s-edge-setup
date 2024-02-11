@@ -87,7 +87,7 @@ spec:
   logSeverityScreen: Info
   nodeToNodeMeshEnabled: true
   nodeMeshMaxRestartTime: 120s
-  asNumber: 63400
+  asNumber: 65521
   bindMode: NodeIP
   listenPort: 179
   #serviceClusterIPs:
@@ -115,7 +115,7 @@ metadata:
   name: my-global-peer
 spec:
   peerIP: 192.168.1.1
-  asNumber: 64567
+  asNumber: 65530
 EOF
 
 calicoctl apply -f calico-bgp-upstream-peer.cfg
