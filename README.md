@@ -116,6 +116,7 @@ TODO
 * kubectl
   * `kubectl get installations -o yaml`
 * calicoctl
+  * `calicoctl version`
 * Done
 
 ## References:
