@@ -8,7 +8,7 @@ Mostly pulled from the following:
   * https://docs.tigera.io/calico/latest/reference/resources/bgpconfig - general config
   * https://docs.tigera.io/calico/latest/networking/configuring/bgp - Peering
 
-## Single-node:
+## Single Node:
 ### Install K3s (change the cluster-cidr to a free network on your network)
 ```
 curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" INSTALL_K3S_EXEC="--flannel-backend=none --cluster-cidr=172.30.0.0/18 --disable-network-policy --disable=traefik" sh -
@@ -21,6 +21,13 @@ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0
 wget https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/custom-resources.yaml
 sed 's/cidr: 192.168.0.0\/16/cidr: 172.30.0.0\/18/g' custom-resources.yaml
 kubectl create -f custom-resources.yaml
+```
+
+Verify the node is operational (confirm the status is Ready):
+```
+dmcken@k3s001:~$  kubectl get nodes
+NAME     STATUS   ROLES                  AGE    VERSION
+k3s001   Ready    control-plane,master   130m   v1.28.6+k3s2
 ```
 
 ### Install calicoctl :
