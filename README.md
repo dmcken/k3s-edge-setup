@@ -38,12 +38,18 @@ sudo mv calicoctl /usr/local/bin/
 
 Create `/etc/calico/calicoctl.cfg` with mode 644 and the following contents:
 ```
+cat <<EOF >calicoctl.cfg
 apiVersion: projectcalico.org/v3
 kind: CalicoAPIConfig
 metadata:
 spec:
   datastoreType: 'kubernetes'
   kubeconfig: '/etc/rancher/k3s/k3s.yaml'
+EOF
+
+chmod 644 calicoctl.cfg
+sudo mkdir -p /etc/calico/
+sudo mv calicoctl.cfg /etc/calico/
 ```
 
 Verify calicoctl is working:
