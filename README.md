@@ -76,8 +76,9 @@ NAME     ASN       IPV4               IPV6
 k3s001   (64512)   192.168.1.120/24          
 ```
 
- Setup the global config
+Setup the global config:
 ```
+cat <<EOF >calico-global-bgp.cfg
 apiVersion: projectcalico.org/v3
 kind: BGPConfiguration
 metadata:
@@ -88,13 +89,15 @@ spec:
   nodeMeshMaxRestartTime: 120s
   asNumber: 63400
   bindMode: NodeIP
-  serviceClusterIPs:
-    - cidr: 10.96.0.0/12
-  serviceExternalIPs:
-    - cidr: 104.244.42.129/32
-    - cidr: 172.217.3.0/24
   listenPort: 179
-  
+  #serviceClusterIPs:
+  #  - cidr: 10.96.0.0/12
+  #serviceExternalIPs:
+  #  - cidr: 104.244.42.129/32
+  #  - cidr: 172.217.3.0/24  
+EOF
+
+calicoctl apply -f calico-global-bgp.cfg
 ```
 
 Notes:
