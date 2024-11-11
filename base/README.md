@@ -14,7 +14,12 @@ Service:
 ```bash
 kubectl create -f bind-service-nodeport.yml
 kubectl create -f bind-service.yml
+
+# To view the currently deployed services
 kubectl get services
+
+# To delete a service
+kubectl delete bind-service-node      # Replace bind-service-node as appropriate.
 ```
 
 Test:
