@@ -1,6 +1,11 @@
-# K3S + Cilium
+# K3S + Cilium Anycast setup
 
-Install on Ubuntu
+
+## Install
+
+Base OS: Ubuntu Server
+
+### Install k3s
 
 ```bash
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='--flannel-backend=none --disable-network-policy --disable-kube-proxy' sudo sh -
@@ -9,7 +14,14 @@ sudo service k3s restart
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 ```
 
-Install cilium cli
+
+Test that k3s is working:
+```bash
+kubectl get pods
+```
+
+### Install cilium cli
+
 ```
 CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
 CLI_ARCH=amd64
@@ -20,22 +32,62 @@ sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
 rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 ```
 
-sudo systemctl status k3s
 
 
 ```bash
-cilium install --version 1.16.3 --set=ipam.operator.clusterPoolIPv4PodCIDRList="10.42.0.0/16" --set bgpControlPlane.enabled=true
+cilium install --version 1.16.3 --set=ipam.operator.clusterPoolIPv4PodCIDRList="10.42.0.0/16" \
+    --set bgpControlPlane.enabled=true
+
+# --set kubeProxyReplacement=true
+# --set ipv6.enabled=true --set ipv4.enabled=true
+# --set k8sServiceHost=172.16.103.110 --set k8sServicePort=6443
+```
+
+## Configure
+
+The bulk of this is pulled from:
+https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/
+
+1. Edit [BGP Cluster Config](bgp-cluster-config.yml) changing the following.
+   1. localASN - Whatever ASN you want your cluster to use.
+   2. For each upstream peer:
+      1. peerASN: <ASN of upstream router>
+      2. peerAddress: <IP Address (v4 or v6) of upstream router>
+2. Done
 
 
+## Maintainence / Monitoring
 
---set kubeProxyReplacement=true
---set ipv6.enabled=true --set ipv4.enabled=true
---set k8sServiceHost=172.16.103.110 --set k8sServicePort=6443
 
+#### Notes
+* Troubleshooting:
+  * https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-troubleshooting/
+  * https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-operation/
+
+
+```
+  advertisements:
+    - advertisementType: "Service"
+      service:
+        addresses:
+          - ExternalIP
+          - LoadBalancerIP
+      selector:
+        matchExpressions:
+          - { key: bgp, operator: In, values: [ blue ] }
 ```
 
 
+```
+{
+  "labels": {
+    "direction": "INGRESS",
+    "reason": "VLAN traffic disallowed by VLAN filter"
+  },
+  "name": "cilium_drop_count_total",
+  "value": 9
+}
+```
 
-### Notes
-* https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/#bgp-adverts-service
+
 
