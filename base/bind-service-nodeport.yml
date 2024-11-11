@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bind-service
+  name: bind-service-node
 spec:
   type: NodePort
   selector:
