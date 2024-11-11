@@ -11,6 +11,6 @@ spec:
   - port: 53
     protocol: UDP
   externalIPs:
-    - 1.1.1.1
+    - 2.2.2.2
   # https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/#externaltrafficpolicy-internaltrafficpolicy
   externalTrafficPolicy: Local
