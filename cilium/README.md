@@ -53,7 +53,11 @@ https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/
    2. For each upstream peer:
       1. peerASN: <ASN of upstream router>
       2. peerAddress: <IP Address (v4 or v6) of upstream router>
-2. Done
+2. Edit
+3. Apply
+   1. `kubectl apply -f bgp-cluster-config.yml`
+   2. `kubectl apply -f bgp-peer-config.yml`
+4. Done
 
 
 ## Maintainence / Monitoring
@@ -63,19 +67,6 @@ https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/
 * Troubleshooting:
   * https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-troubleshooting/
   * https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-operation/
-
-
-```
-  advertisements:
-    - advertisementType: "Service"
-      service:
-        addresses:
-          - ExternalIP
-          - LoadBalancerIP
-      selector:
-        matchExpressions:
-          - { key: bgp, operator: In, values: [ blue ] }
-```
 
 
 ```

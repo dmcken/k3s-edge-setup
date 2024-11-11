@@ -9,6 +9,7 @@ spec:
     - advertisementType: "Service"
       service:
         addresses:          # <-- specify the service types to advertise
+          # - ExternalIP
           - LoadBalancerIP
       selector:             # <-- select Services to advertise
         matchExpressions:
