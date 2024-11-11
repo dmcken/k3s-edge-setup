@@ -12,6 +12,7 @@ kubectl logs <pod_name>
 
 Service:
 ```bash
+kubectl create -f bind-service-nodeport.yml
 kubectl create -f bind-service.yml
 kubectl get services
 ```
