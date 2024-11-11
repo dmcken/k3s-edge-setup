@@ -68,6 +68,7 @@ https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/
 * Troubleshooting:
   * https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-troubleshooting/
   * https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-operation/
+  * https://docs.cilium.io/en/stable/network/kubernetes/troubleshooting/
 * Enhancements / Changes:
   * --allocate-node-cidrs - https://docs.cilium.io/en/stable/network/kubernetes/requirements/#enable-automatic-node-cidr-allocation-recommended
 * Done
