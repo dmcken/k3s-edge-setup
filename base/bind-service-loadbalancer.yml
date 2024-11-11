@@ -1,9 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bind-service
+  name: bind-service-lb
 spec:
+  type: LoadBalancer
   selector:
     app: bind
   ports:
   - port: 53
+  externalIPs:
+    - 1.1.1.1
