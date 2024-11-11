@@ -1,0 +1,10 @@
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumBGPAdvertisement
+metadata:
+  name: pod-ip-pool-advert
+  labels:
+    advertise: bgp
+spec:
+  advertisements:
+    - advertisementType: "CiliumPodIPPool"
