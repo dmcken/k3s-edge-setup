@@ -24,9 +24,13 @@ sudo systemctl status k3s
 
 
 ```bash
-cilium install --version 1.16.3 --set=ipam.operator.clusterPoolIPv4PodCIDRList="10.42.0.0/16" --helm-set=operator.replicas=1 --set kubeProxyReplacement=true
+cilium install --version 1.16.3 --set=ipam.operator.clusterPoolIPv4PodCIDRList="10.42.0.0/16" --set bgpControlPlane.enabled=true
 
---namespace kube-system --set kubeProxyReplacement=true --set k8sServiceHost=$private_ip --set k8sServicePort=6443 --set ingressController.enabled=true --set ingressController.loadbalancerMode=shared --set ingressController.default=true --set gatewayAPI.enabled=true --set ipv4.enabled=false --helm-set routingMode=native --helm-set ipv6NativeRoutingCIDR=fd00::/8 --helm-set enableIPv6Masquerade=true --set ipv6.enabled=true --helm-set autoDirectNodeRoutes=true
+
+
+--set kubeProxyReplacement=true
+--set ipv6.enabled=true --set ipv4.enabled=true
+--set k8sServiceHost=172.16.103.110 --set k8sServicePort=6443
 
 ```
 
