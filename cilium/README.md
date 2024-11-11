@@ -64,12 +64,18 @@ https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/
 
 
 #### Notes
+
 * Troubleshooting:
   * https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-troubleshooting/
   * https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-operation/
+* Enhancements / Changes:
+  * --allocate-node-cidrs - https://docs.cilium.io/en/stable/network/kubernetes/requirements/#enable-automatic-node-cidr-allocation-recommended
+* Done
+
 
 
 ```
+Failing connectivity tests:
 {
   "labels": {
     "direction": "INGRESS",
