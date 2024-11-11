@@ -5,7 +5,7 @@ metadata:
 spec:
   nodeSelector:
     matchLabels:
-      rack: rack0
+      role: "control-plane"
   bgpInstances:
   - name: "instance-65000"
     localASN: 65000
