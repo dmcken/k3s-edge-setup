@@ -3,6 +3,8 @@ kind: CiliumBGPPeerConfig
 metadata:
   name: rtr-1-v4
 spec:
+  transport:
+    peerPort: 179
   timers:
     # holdTimeSeconds: 9
     # keepAliveTimeSeconds: 3
