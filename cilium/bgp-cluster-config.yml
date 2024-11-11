@@ -3,9 +3,9 @@ kind: CiliumBGPClusterConfig
 metadata:
   name: cilium-bgp
 spec:
-  nodeSelector:
-    matchLabels:
-      role: "control-plane"
+  # nodeSelector:
+  #   matchLabels:
+  #     role: "control-plane"
   bgpInstances:
   - name: "instance-65000"
     localASN: 65000
