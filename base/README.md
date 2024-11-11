@@ -18,6 +18,10 @@ kubectl get services
 
 Test:
 ```bash
-dig
+dig @<ip of k3s host> -p 30053 www.google.com.
+```
+
+```ps
+nslookup -port=30053 www.google.com. <ip of k3s host>
 ```
 
