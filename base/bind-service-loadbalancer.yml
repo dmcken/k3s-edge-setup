@@ -4,6 +4,7 @@ metadata:
   name: bind-service-lb
 spec:
   type: LoadBalancer
+  loadBalancerClass: io.cilium/bgp-control-plane
   selector:
     app: bind
   ports:
