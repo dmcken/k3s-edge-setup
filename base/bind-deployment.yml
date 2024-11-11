@@ -19,8 +19,8 @@ spec:
         image: cytopia/bind
         env:
         - name: DOCKER_LOGS
-          value: 1
+          value: "1"
         - name: ALLOW_QUERY
-          value: any
+          value: "any"
         ports:
         - containerPort: 53
