@@ -3,6 +3,10 @@
 Copied from:
 https://medium.com/swlh/serving-bind-dns-in-kubernetes-8639fce37448
 
+## Node port:
+
+This will create a deployment and expose it to the network on the IP of the node on port 30053 (lower ports are not available). Obviously this not redundant in any way but is here to provide a baseline.
+
 Deployment:
 ```bash
 kubectl create -f bind-deployment.yml
@@ -30,4 +34,7 @@ dig @<ip of k3s host> -p 30053 www.google.com.
 ```ps
 nslookup -port=30053 www.google.com. <ip of k3s host>
 ```
+
+
+## Load balancer
 
