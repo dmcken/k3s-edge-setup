@@ -1,3 +1,4 @@
+# This triggers the advertisement of 10.42.0.0/24
 apiVersion: cilium.io/v2alpha1
 kind: CiliumBGPAdvertisement
 metadata:
