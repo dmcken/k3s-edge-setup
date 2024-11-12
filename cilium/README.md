@@ -3,7 +3,7 @@
 
 ## Install
 
-Base OS: Ubuntu Server
+Base OS: Ubuntu Server 24.04
 
 ### Install k3s
 
@@ -28,13 +28,6 @@ curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --
 sudo apt update
 sudo apt install kubeadm
 ```
-
-
-Test that k3s is working:
-```bash
-kubectl get nodes
-```
-
 ### Install cilium cli
 
 ```bash
@@ -58,7 +51,27 @@ cilium install --version 1.16.3 --set=ipam.operator.clusterPoolIPv4PodCIDRList="
 cilium status --wait
 ```
 
+### Confirm all is working
+
+Test that k3s is working (ensure the status is Ready):
+```bash
+kubectl get nodes -o wide
+
+kubectl get pods --all-namespaces
+```
+
 ## Configure
+
+### Common setup
+
+#### IP Pool
+
+```bash
+kubectl apply -f cilium/lb-pool.yml
+kubectl get ippools
+kubectl describe ippool lb-pool
+```
+
 
 The bulk of this is pulled from:
 https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/
@@ -147,4 +160,8 @@ Events:
 ```
 
 
+References:
+* https://blog.stonegarden.dev/articles/2024/02/bootstrapping-k3s-with-cilium/
+  * Used for install without kube-proxy
+* Done
 
