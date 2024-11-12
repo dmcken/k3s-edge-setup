@@ -9,7 +9,7 @@ metadata:
 spec:
   type: LoadBalancer
   loadBalancerClass: io.cilium/bgp-control-plane
-  LoadBalancerIP: 2.2.2.2
+  loadBalancerIP: 2.2.2.2
   selector:
     app: bind
   ports:
