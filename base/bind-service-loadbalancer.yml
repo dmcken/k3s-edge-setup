@@ -13,7 +13,7 @@ spec:
   selector:
     app: bind
   ports:
-  - port: 53
+  - port: 30053
     protocol: UDP
   # https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/#externaltrafficpolicy-internaltrafficpolicy
   externalTrafficPolicy: Local
