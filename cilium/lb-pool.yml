@@ -4,5 +4,4 @@ metadata:
   name: "lb-pool"
 spec:
   blocks:
-    - start: "2.2.2.2"
-      stop:  "2.2.2.2"
+  - cidr: "2.2.2.2/32"
