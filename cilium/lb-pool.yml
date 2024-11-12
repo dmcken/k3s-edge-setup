@@ -7,4 +7,4 @@ spec:
   - cidr: "2.2.2.2/32"
   serviceSelector:
     matchExpressions:
-      - {key: color, operator: In, values: [anycast-dns]}
+      - {key: color, operator: In, values: [yellow]}
