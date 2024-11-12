@@ -6,9 +6,13 @@ metadata:
     advertise: bgp
 spec:
   advertisements:
+    - advertisementType: "PodCIDR"
     - advertisementType: "Service"
       service:
         addresses:
-          - ClusterIP
-          - ExternalIP
           - LoadBalancerIP
+      selector:
+        matchLabels:
+          color: yellow
+        matchExpressions:
+          - {key: io.kubernetes.service.namespace, operator: In, values: ["tenant-c"]}

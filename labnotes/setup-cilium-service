@@ -1,0 +1,115 @@
+# Cilium LB-IPAM
+
+root@server:~# yq pool.yaml
+# No selector, match all
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "pool"
+spec:
+  blocks:
+    - cidr: "20.0.10.0/24"
+root@server:~# yq service-blue.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-blue
+  namespace: tenant-a
+  labels:
+    color: blue
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 1234
+root@server:~# kubectl apply -f service-blue.yaml
+service/service-blue created
+root@server:~# kubectl get svc/service-blue -n tenant-a
+NAME           TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service-blue   LoadBalancer   10.96.229.228   <pending>     1234:32608/TCP   3s
+root@server:~# kubectl apply -f pool.yaml
+ciliumloadbalancerippool.cilium.io/pool created
+root@server:~# kubectl get svc/service-blue -n tenant-a
+NAME           TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service-blue   LoadBalancer   10.96.229.228   20.0.10.0     1234:32608/TCP   21s
+
+# Service Selectors
+
+root@server:~# yq pool-primary.yaml
+# Expression selector
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "pool-primary"
+spec:
+  blocks:
+    - cidr: "60.0.10.0/24"
+  serviceSelector:
+    matchExpressions:
+      - {key: color, operator: In, values: [yellow, red, blue]}
+root@server:~# kubectl apply -f pool-primary.yaml
+kubectl delete -f pool.yaml
+ciliumloadbalancerippool.cilium.io/pool-primary created
+ciliumloadbalancerippool.cilium.io "pool" deleted
+root@server:~# kubectl apply -f service-red.yaml
+kubectl apply -f service-green.yaml
+service/service-red created
+service/service-green created
+root@server:~# kubectl get svc -n tenant-b --show-labels
+NAME            TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE   LABELS
+service-green   LoadBalancer   10.96.106.218   <pending>     1234:30390/TCP   4s    color=green
+service-red     LoadBalancer   10.96.224.5     60.0.10.1     1234:30265/TCP   5s    color=red
+root@server:~# yq pool-green.yaml
+# # Second pool, label selector
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "pool-green"
+spec:
+  blocks:
+    - cidr: "40.0.10.0/24"
+  serviceSelector:
+    matchLabels:
+      color: green
+root@server:~# kubectl apply -f pool-green.yaml
+ciliumloadbalancerippool.cilium.io/pool-green created
+root@server:~# kubectl get svc/service-green -n tenant-b
+NAME            TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service-green   LoadBalancer   10.96.106.218   40.0.10.0     1234:30390/TCP   15s
+
+
+# Requesting a specific IP
+
+root@server:~# yq service-yellow.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-yellow
+  namespace: tenant-c
+  labels:
+    color: yellow
+  annotations:
+    "io.cilium/lb-ipam-ips": "30.0.10.100,40.0.10.100,50.0.10.100,60.0.10.100"
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 1234
+root@server:~# yq pool-yellow.yaml
+# Namespace selector
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "pool-yellow"
+spec:
+  blocks:
+    - cidr: "50.0.10.0/24"
+  serviceSelector:
+    matchLabels:
+      "io.kubernetes.service.namespace": "tenant-c"
+root@server:~# kubectl apply -f service-yellow.yaml
+kubectl apply -f pool-yellow.yaml
+service/service-yellow created
+ciliumloadbalancerippool.cilium.io/pool-yellow created
+root@server:~# kubectl get svc/service-yellow -n tenant-c
+NAME             TYPE           CLUSTER-IP    EXTERNAL-IP               PORT(S)          AGE
+service-yellow   LoadBalancer   10.96.89.14   50.0.10.100,60.0.10.100   1234:32022/TCP   3s
+root@server:~#
