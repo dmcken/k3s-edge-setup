@@ -1,11 +1,12 @@
+---
 apiVersion: cilium.io/v2alpha1
 kind: CiliumBGPClusterConfig
 metadata:
   name: cilium-bgp
 spec:
-  # nodeSelector:
-  #   matchLabels:
-  #     role: "control-plane"
+  nodeSelector:
+    matchLabels:
+      rack: rack0
   bgpInstances:
   - name: "instance-65000"
     localASN: 65000
