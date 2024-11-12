@@ -107,6 +107,44 @@ kubectl describe ippool lb-pool
 ```
 
 
+### Deployment + Service
+
+Start deployment
+
+```bash
+kubectl apply -f base/bind-deployment.yml
+
+# Confirm running
+kubectl get deployment
+```
+
+Start service
+
+```bash
+kubectl apply -f base/bind-service-loadbalancer.yml
+
+# Confirm running
+kubectl get service
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 The bulk of this is pulled from:
 https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/
 

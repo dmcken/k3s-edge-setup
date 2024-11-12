@@ -12,6 +12,8 @@ spec:
   loadBalancerIP: 2.2.2.2
   selector:
     app: bind
+  labels:
+    color: anycast-dns
   ports:
   - port: 30053
     protocol: UDP
