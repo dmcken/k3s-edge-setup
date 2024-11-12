@@ -58,11 +58,45 @@ Test that k3s is working (ensure the status is Ready):
 kubectl get nodes -o wide
 
 kubectl get pods --all-namespaces
+
+kubectl api-resources | grep -i cilium
+kubectl get pods -n kube-system
+```
+
+Turn on BGP control plane:
+```bash
+cilium config view | grep -i bgp
+
+# Ensure the following
+enable-bgp-control-plane                       true
+
+# if not use the following:
+cilium config set enable-bgp-control-plane true
 ```
 
 ## Configure
 
 ### Common setup
+
+#### BGP
+
+```bash
+kubectl apply -f cilium/bgp-peer-config.yml
+kubectl apply -f cilium/bgp-cluster-config.yml
+
+kubectl get nodes
+# Use the name from the above to replace k3s1
+kubectl label nodes k3s1 rack=rack0
+
+# Confirm the nodes you want to BGP peer are now labeled
+kubectl get nodes -l rack=rack0
+```
+
+Confirm BGP peers:
+```bash
+cilium bgp peers
+```
+
 
 #### IP Pool
 
@@ -87,17 +121,11 @@ https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/
    2. `kubectl apply -f bgp-peer-config.yml`
 4. Done
 
-### Set cilium paramters after install
-
-```bash
-# Updating config values after install
-cilium config set enable-bgp-control-plane true
-```
-
 ## Maintainence / Monitoring
 
+How to check status
 
-#### Notes
+## Notes
 
 * Troubleshooting:
   * Commands:
@@ -163,5 +191,7 @@ Events:
 References:
 * https://blog.stonegarden.dev/articles/2024/02/bootstrapping-k3s-with-cilium/
   * Used for install without kube-proxy
+* https://rx-m.com/kubernetes-loadbalance-service-using-cilium-bgp-control-plane/
+  * Used for BGP setup
 * Done
 

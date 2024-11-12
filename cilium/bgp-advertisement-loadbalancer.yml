@@ -9,6 +9,5 @@ spec:
     - advertisementType: "Service"
       service:
         addresses:
-          - ClusterIP
-          - ExternalIP
+          # - ExternalIP
           - LoadBalancerIP

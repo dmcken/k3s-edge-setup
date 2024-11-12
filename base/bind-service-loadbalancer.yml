@@ -4,11 +4,12 @@ metadata:
   name: bind-service-lb
   # Found at:
   # https://docs.cilium.io/en/stable/network/lb-ipam/#requesting-ips
-  annotations:
-    "lbipam.cilium.io/ips": "2.2.2.2"
+  # annotations:
+  #   "lbipam.cilium.io/ips": "2.2.2.2"
 spec:
   type: LoadBalancer
   loadBalancerClass: io.cilium/bgp-control-plane
+  LoadBalancerIP: 2.2.2.2
   selector:
     app: bind
   ports:
