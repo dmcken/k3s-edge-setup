@@ -1,4 +1,5 @@
-# K3S + Cilium Anycast setup
+# K3S + Cilium Anycast setup (Single-Node)
+
 
 
 ## Install
@@ -22,14 +23,16 @@ echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> $HOME/.bashrc
 source $HOME/.bashrc
 ```
 
-```bash
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-sudo apt update
-sudo apt install kubeadm
-```
-### Install cilium cli
+### Install helm
 
+```bash
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+```
+
+### Install Cilium
+
+
+First install the CLI:
 ```bash
 CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
 CLI_ARCH=amd64
@@ -40,8 +43,7 @@ sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
 rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 ```
 
-Install cilium itself
-
+Install cilium itself:
 ```bash
 cilium install --version 1.16.3 --set=ipam.operator.clusterPoolIPv4PodCIDRList="10.42.0.0/16" \
     --set bgpControlPlane.enabled=true --set kubeProxyReplacement=true --set ipv6.enabled=true \
