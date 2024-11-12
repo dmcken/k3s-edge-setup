@@ -5,15 +5,15 @@ metadata:
   # Found at:
   # https://docs.cilium.io/en/stable/network/lb-ipam/#requesting-ips
   annotations:
-    "lbipam.cilium.io/ips": "2.2.2.2"
+    "io.cilium/lb-ipam-ips": "2.2.2.2"
   labels:
     color: yellow
 spec:
   type: LoadBalancer
-  selector:
-    app: bind
+  # selector:
+  #   app: bind
   ports:
   - port: 53
     protocol: UDP
   # https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/#externaltrafficpolicy-internaltrafficpolicy
-  externalTrafficPolicy: Local
+  # externalTrafficPolicy: Local
