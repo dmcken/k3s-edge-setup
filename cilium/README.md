@@ -8,21 +8,36 @@ Base OS: Ubuntu Server
 ### Install k3s
 
 ```bash
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='--flannel-backend=none --disable-network-policy --disable-kube-proxy' sudo sh -
+curl -sfL https://get.k3s.io | sudo sh -s - \
+  --flannel-backend=none \
+  --disable-kube-proxy \
+  --disable-network-policy \
+  --disable servicelb \
+  --disable traefik \
+  --cluster-init
+
 echo -e 'K3S_KUBECONFIG_MODE="644"' | sudo tee -a /etc/systemd/system/k3s.service.env
 sudo service k3s restart
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> $HOME/.bashrc
+source $HOME/.bashrc
+```
+
+```bash
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+sudo apt update
+sudo apt install kubeadm
 ```
 
 
 Test that k3s is working:
 ```bash
-kubectl get pods
+kubectl get nodes
 ```
 
 ### Install cilium cli
 
-```
+```bash
 CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
 CLI_ARCH=amd64
 if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
@@ -32,15 +47,15 @@ sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
 rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 ```
 
-
+Install cilium itself
 
 ```bash
 cilium install --version 1.16.3 --set=ipam.operator.clusterPoolIPv4PodCIDRList="10.42.0.0/16" \
-    --set bgpControlPlane.enabled=true
+    --set bgpControlPlane.enabled=true --set kubeProxyReplacement=true --set ipv6.enabled=true \
+    --set k8sServiceHost=127.0.0.1 --set k8sServicePort=6443 --helm-set=operator.replicas=1
 
-# --set kubeProxyReplacement=true
-# --set ipv6.enabled=true --set ipv4.enabled=true
-# --set k8sServiceHost=172.16.103.110 --set k8sServicePort=6443
+
+cilium status --wait
 ```
 
 ## Configure
@@ -59,6 +74,12 @@ https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/
    2. `kubectl apply -f bgp-peer-config.yml`
 4. Done
 
+### Set cilium paramters after install
+
+```bash
+# Updating config values after install
+cilium config set enable-bgp-control-plane true
+```
 
 ## Maintainence / Monitoring
 
@@ -66,9 +87,18 @@ https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/
 #### Notes
 
 * Troubleshooting:
-  * https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-troubleshooting/
-  * https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-operation/
-  * https://docs.cilium.io/en/stable/network/kubernetes/troubleshooting/
+  * Commands:
+    * cilium config view
+    * kubectl -n kube-system get pods -l k8s-app=cilium
+    * kubectl -n kube-system exec cilium-2hq5z -- cilium-dbg status
+    * kubectl exec -n kube-system ds/cilium -- cilium-dbg status
+    * kubectl exec -n kube-system ds/cilium -- cilium-dbg status --verbose
+    *
+  * General links:
+    * https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-troubleshooting/
+    * https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-operation/
+    * https://docs.cilium.io/en/stable/network/kubernetes/troubleshooting/
+    * https://docs.cilium.io/en/stable/operations/troubleshooting/
 * Enhancements / Changes:
   * --allocate-node-cidrs - https://docs.cilium.io/en/stable/network/kubernetes/requirements/#enable-automatic-node-cidr-allocation-recommended
 * Done
@@ -85,6 +115,35 @@ Failing connectivity tests:
   "name": "cilium_drop_count_total",
   "value": 9
 }
+```
+
+```bash
+dmcken@k3s1:~/k3s-edge-setup/base$ kubectl describe service bind-service-lb
+Name:                     bind-service-lb
+Namespace:                default
+Labels:                   <none>
+Annotations:              lbipam.cilium.io/ips: 2.2.2.2
+Selector:                 app=bind
+Type:                     LoadBalancer
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.43.227.184
+IPs:                      10.43.227.184
+LoadBalancer Ingress:     2.2.2.2
+Port:                     <unset>  53/UDP
+TargetPort:               53/UDP
+NodePort:                 <unset>  31850/UDP
+Endpoints:                10.42.0.174:53
+Session Affinity:         None
+External Traffic Policy:  Local
+HealthCheck NodePort:     30501
+Events:
+  Type     Reason                   Age   From                   Message
+  ----     ------                   ----  ----                   -------
+  Normal   EnsuringLoadBalancer     117s  service-controller     Ensuring load balancer
+  Warning  UnAvailableLoadBalancer  117s  service-lb-controller  There are no available nodes for LoadBalancer
+  Normal   AppliedDaemonSet         117s  service-lb-controller  Applied LoadBalancer DaemonSet kube-system/svclb-bind-service-lb-b5f07482
+  Normal   UpdatedLoadBalancer      117s  service-lb-controller  Updated LoadBalancer with new IPs: [2.2.2.2] -> [192.168.1.219]
 ```
 
 
