@@ -2,7 +2,7 @@
 apiVersion: cilium.io/v2alpha1
 kind: CiliumBGPAdvertisement
 metadata:
-  name: bgp-advertisements
+  name: bgp-advertisements-podcidr
   labels:
     advertise: bgp
 spec:
