@@ -1,12 +1,20 @@
 # K3S + Cilium Anycast setup (Single-Node)
 
+A single node k3s
 
 
 ## Install
 
 Base OS: Ubuntu Server 24.04
+* Disk: Entire disk
+* Network: <DHCP>
+* Hostname: <whatever you want, I used k3s1>
+* User: <aything with sudo privileges>
+* Post install:
+  * `sudo apt update && sudo apt upgrade`
+  * `git clone https://github.com/dmcken/k3s-edge-setup.git` in home directory.
 
-### Install k3s
+### Install k3s & helm
 
 ```bash
 curl -sfL https://get.k3s.io | sudo sh -s - \
@@ -21,11 +29,7 @@ echo -e 'K3S_KUBECONFIG_MODE="644"' | sudo tee -a /etc/systemd/system/k3s.servic
 sudo service k3s restart
 echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> $HOME/.bashrc
 source $HOME/.bashrc
-```
 
-### Install helm
-
-```bash
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ```
 
@@ -49,9 +53,10 @@ cilium install --version 1.16.3 --set=ipam.operator.clusterPoolIPv4PodCIDRList="
     --set bgpControlPlane.enabled=true --set kubeProxyReplacement=true --set ipv6.enabled=true \
     --set k8sServiceHost=127.0.0.1 --set k8sServicePort=6443 --helm-set=operator.replicas=1
 
-
 cilium status --wait
 ```
+
+The above will cycle a few times before exiting on its own (hopefully with zero errors). Wait for it to do so before continuing.
 
 ### Confirm all is working
 
@@ -80,13 +85,35 @@ cilium config set enable-bgp-control-plane true
 
 ### Common setup
 
+```bash
+kubectl apply -f base/
+kubectl apply -f cilium-single/lb-pool.yml
+```
+
+```bash
+kubectl get deployments
+# Output
+NAME              READY   UP-TO-DATE   AVAILABLE   AGE
+bind-deployment   3/3     3            3           22s
+```
+
+```bash
+kubectl get service
+# Output
+NAME                TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+bind-service-lb     LoadBalancer   10.43.68.80    2.2.2.2       53:30534/UDP   2m34s
+bind-service-node   NodePort       10.43.65.200   <none>        53:30053/UDP   2m34s
+kubernetes          ClusterIP      10.43.0.1      <none>        443/TCP        5m12s
+```
+
 #### BGP
 
 ```bash
 kubectl apply -f cilium-single/bgp-peer-config.yml
 kubectl apply -f cilium-single/bgp-cluster-config.yml
 
-kubectl get nodes
+# The node needs to be labeled with rack=rack0
+kubectl get nodes --show-labels=true
 # Use the name from the above to replace k3s1
 kubectl label nodes k3s1 rack=rack0
 
@@ -99,71 +126,18 @@ Confirm BGP peers:
 cilium bgp peers
 ```
 
-
-#### IP Pool
-
+Turn on service advertisement:
 ```bash
-kubectl apply -f cilium/lb-pool.yml
-kubectl get ippools
-kubectl describe ippool lb-pool
+kubectl apply -f cilium-single/bgp-advertisement-loadbalancer.yml
 ```
-
-
-### Deployment + Service
-
-Start deployment
-
-```bash
-kubectl apply -f base/bind-deployment.yml
-
-# Confirm running
-kubectl get deployment
-```
-
-Start service
-
-```bash
-kubectl apply -f base/bind-service-loadbalancer.yml
-
-# Confirm running
-kubectl get service
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-The bulk of this is pulled from:
-https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane-v2/
-
-1. Edit [BGP Cluster Config](bgp-cluster-config.yml) changing the following.
-   1. localASN - Whatever ASN you want your cluster to use.
-   2. For each upstream peer:
-      1. peerASN: <ASN of upstream router>
-      2. peerAddress: <IP Address (v4 or v6) of upstream router>
-2. Edit
-3. Apply
-   1. `kubectl apply -f bgp-cluster-config.yml`
-   2. `kubectl apply -f bgp-peer-config.yml`
-4. Done
 
 ## Maintainence / Monitoring
 
-How to check status
+### Check BGP routes
+
+```bash
+cilium bgp routes
+```
 
 ## Notes
 
