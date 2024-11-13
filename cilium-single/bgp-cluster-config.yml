@@ -13,6 +13,6 @@ spec:
     peers:
     - name: "RTR-1-v4"
       peerASN: 65530
-      peerAddress: 192.168.1.12
+      peerAddress: 192.168.1.1
       peerConfigRef:
         name: "upstream-peer-v4"
