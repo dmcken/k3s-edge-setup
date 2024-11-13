@@ -10,8 +10,8 @@ metadata:
     color: yellow
 spec:
   type: LoadBalancer
-  # selector:
-  #   app: bind
+  selector:
+    app: bind
   ports:
   - port: 53
     protocol: UDP

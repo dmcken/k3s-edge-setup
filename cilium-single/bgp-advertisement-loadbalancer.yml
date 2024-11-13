@@ -4,14 +4,12 @@ metadata:
   name: bgp-advertisements-lb
   labels:
     advertise: bgp
-    advertise: generic
 spec:
   advertisements:
-    - advertisementType: "PodCIDR"
     - advertisementType: "Service"
       service:
         addresses:
           - LoadBalancerIP
-      selector:
-        matchLabels:
-          color: yellow
+      selector:             # <-- select Services to advertise
+        matchExpressions:
+          - { key: bgp, operator: In, values: [ blue ] }
