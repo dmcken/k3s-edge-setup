@@ -10,6 +10,6 @@ spec:
       service:
         addresses:
           - LoadBalancerIP
-      selector:             # <-- select Services to advertise
+      selector:
         matchLabels:
           color: yellow
