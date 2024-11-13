@@ -111,3 +111,39 @@ RPKI validation codes: V valid, I invalid, N Not found
 
 Displayed  3 routes and 3 total paths
 root@server:~#
+
+root@server:~# kubectl get services -A
+NAMESPACE     NAME             TYPE           CLUSTER-IP      EXTERNAL-IP               PORT(S)                  AGE
+default       kubernetes       ClusterIP      10.96.0.1       <none>                    443/TCP                  6m48s
+kube-system   cilium-envoy     ClusterIP      None            <none>                    9964/TCP                 6m9s
+kube-system   hubble-peer      ClusterIP      10.96.216.154   <none>                    443/TCP                  6m9s
+kube-system   kube-dns         ClusterIP      10.96.0.10      <none>                    53/UDP,53/TCP,9153/TCP   6m46s
+tenant-a      service-blue     LoadBalancer   10.96.224.93    60.0.10.0                 1234:31405/TCP           5m41s
+tenant-b      service-green    LoadBalancer   10.96.240.254   40.0.10.0                 1234:30179/TCP           5m41s
+tenant-b      service-red      LoadBalancer   10.96.36.174    60.0.10.1                 1234:30769/TCP           5m41s
+tenant-c      service-yellow   LoadBalancer   10.96.95.144    50.0.10.100,60.0.10.100   1234:31928/TCP           5m40s
+root@server:~# kubectl describe services -A service-yellow
+error: a resource cannot be retrieved by name across all namespaces
+root@server:~# kubectl describe services service-yellow
+Error from server (NotFound): services "service-yellow" not found
+root@server:~# kubectl describe services -n tenant-c service-yellow
+Name:                     service-yellow
+Namespace:                tenant-c
+Labels:                   color=yellow
+Annotations:              io.cilium/lb-ipam-ips: 30.0.10.100,40.0.10.100,50.0.10.100,60.0.10.100
+Selector:                 <none>
+Type:                     LoadBalancer
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.96.95.144
+IPs:                      10.96.95.144
+LoadBalancer Ingress:     60.0.10.100 (VIP), 50.0.10.100 (VIP)
+Port:                     <unset>  1234/TCP
+TargetPort:               1234/TCP
+NodePort:                 <unset>  31928/TCP
+Endpoints:                <none>
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Internal Traffic Policy:  Cluster
+Events:                   <none>
+root@server:~#
