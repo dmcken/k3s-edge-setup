@@ -11,5 +11,5 @@ spec:
         addresses:
           - LoadBalancerIP
       selector:             # <-- select Services to advertise
-        matchExpressions:
-          - { key: bgp, operator: In, values: [ blue ] }
+        matchLabels:
+          color: yellow

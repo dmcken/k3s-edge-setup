@@ -83,8 +83,8 @@ cilium config set enable-bgp-control-plane true
 #### BGP
 
 ```bash
-kubectl apply -f cilium/bgp-peer-config.yml
-kubectl apply -f cilium/bgp-cluster-config.yml
+kubectl apply -f cilium-single/bgp-peer-config.yml
+kubectl apply -f cilium-single/bgp-cluster-config.yml
 
 kubectl get nodes
 # Use the name from the above to replace k3s1
