@@ -7,6 +7,9 @@ metadata:
 spec:
   advertisements:
     - advertisementType: "Service"
+      attributes:
+        communities:
+          standard: [ "65000:1000" ]
       service:
         addresses:
           - LoadBalancerIP
