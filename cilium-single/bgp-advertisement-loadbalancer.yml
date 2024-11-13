@@ -4,9 +4,9 @@ metadata:
   name: bgp-advertisements-lb
   labels:
     advertise: bgp
+    advertise: generic
 spec:
   advertisements:
-    - advertisementType: "PodCIDR"
     - advertisementType: "Service"
       service:
         addresses:
