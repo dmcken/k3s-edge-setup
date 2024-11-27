@@ -1,14 +1,12 @@
 # k3s-edge-setup
 
-Problem definition: 
+Problem definition: I want to run various service on specific
 
-
+* Redundant upstream BGP connections.
+*
 
 ## Single Node:
-### Prerequisites:
-* Ubuntu 22.04
-* Static IP is not required (DHCP with a static lease to anchor the BGP peer).
-* Local user with sudo privileges.
+
 
 ### Install K3s (change the cluster-cidr to a free network on your network)
 ```
@@ -60,15 +58,15 @@ sudo mv calicoctl.cfg /etc/calico/
 Verify calicoctl is working:
 
 ```
-dmcken@k3s001:~$ calicoctl get nodes 
-NAME     
-k3s001   
+dmcken@k3s001:~$ calicoctl get nodes
+NAME
+k3s001
 ```
 If you get any errors these need to be resolved first.
 
 ### Setup BGP:
 
-#### Global BGP Config: 
+#### Global BGP Config:
 Create a file calico-default-bgp-config.yaml with the following contents:
 
 ```
@@ -77,8 +75,8 @@ NAME     STATUS   ROLES                  AGE   VERSION        INTERNAL-IP     EX
 k3s001   Ready    control-plane,master   12h   v1.28.6+k3s2   192.168.1.120   <none>        Ubuntu 22.04.3 LTS   5.15.0-94-generic   containerd://1.7.11-k3s2
 
 calicoctl get nodes -o wide
-NAME     ASN       IPV4               IPV6   
-k3s001   (64512)   192.168.1.120/24          
+NAME     ASN       IPV4               IPV6
+k3s001   (64512)   192.168.1.120/24
 ```
 
 Setup the global config:
@@ -99,7 +97,7 @@ spec:
   #  - cidr: 10.96.0.0/12
   #serviceExternalIPs:
   #  - cidr: 104.244.42.129/32
-  #  - cidr: 172.217.3.0/24  
+  #  - cidr: 172.217.3.0/24
 EOF
 
 calicoctl apply -f calico-global-bgp.cfg
